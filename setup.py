@@ -10,6 +10,5 @@ setup(name='hidman',
       author=hidman.__authors__,
       author_email=hidman.__emails__,
       license=hidman.__license__,
-      install_requires=hidman.__requirements__,
       packages=setuptools.find_packages(),
       zip_safe=False)
