@@ -22,6 +22,14 @@ x-hidmanbase: &hidman-base
 
 services:
 
-  hidman-dev:
+  hidman-serv:
     <<: *hidman-base
-    command: bash
+    devices:
+      - /dev/input/by-id/usb-MicroPython_Pyboard_Virtual_Comm_Port_in_FS_Mode_206B349A344D-event-kbd:/dev/input/pyboard
+    command: python3 hidman/tests/02_server.py
+
+  hidman-client:
+    <<: *hidman-base
+    command: python3 hidman/tests/02_client.py
+    depends_on:
+      - hidman-serv
