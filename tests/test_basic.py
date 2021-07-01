@@ -3,7 +3,7 @@ import threading
 import time
 import statistics
 
-from hidman.core import HIDServer, HIDClient, HIDDevice
+from hidman.core import HIDServer, HIDClient
 
 
 class TestLatency:
@@ -13,13 +13,5 @@ class TestLatency:
         t = threading.Thread(target=serv.run)
         t.start()
         client = HIDClient()
-        trials = []
-        for i in range(0,1000):
-            t0 = time.perf_counter()
-            client.waitEvent()
-            trials.append(time.perf_counter() - t0)
-        print(statistics.variance(trials))
-
-
-t = TestLatency()
-t.test_run()
+        client.waitEvent()
+        client.close()

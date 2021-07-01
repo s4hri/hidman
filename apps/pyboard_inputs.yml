@@ -1,0 +1,20 @@
+version: '3.7'
+
+services:
+
+  pyboard-inputs:
+    image: iitschri/hidman:latest
+
+    command: python3 /usr/local/src/hidman/apps/python-examples/pyboard_loop.py
+
+    devices:
+      - ${HIDMAN_DEVICE}:/dev/input/hidman0
+
+    privileged: true
+    stdin_open: true
+    tty: true
+
+    volumes:
+      - type: bind
+        source: ../
+        target: /usr/local/src/hidman
