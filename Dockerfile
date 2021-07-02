@@ -12,4 +12,4 @@ WORKDIR /usr/local/src/
 
 COPY . hidman
 
-RUN cd hidman && pip3 install -r requirements.txt && pip3 install .
+RUN cd hidman && pip3 install .
