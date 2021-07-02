@@ -13,7 +13,15 @@ class HIDDevice:
         else:
             self._device = device
 
-    def waitEvent(self, event_type=None, event_code=None, event_value=None, timeout_ms=None):
+    def clear(self):
+        if self._device:
+            while not self._device.read_one() is None:
+                return
+        return
+
+    def waitEvent(self, event_type=None, event_code=None, event_value=None, timeout_ms=None, clear_events=True):
+        if clear_events:
+            self.clear()
         if self._device:
             for event in self._device.read_loop():
                 if not event_type is None:
