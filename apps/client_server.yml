@@ -18,12 +18,12 @@ services:
 
   hidman-server:
     <<: *hidman-base
-    command: python3 /usr/local/src/hidman/apps/python-examples/pyboard_server.py
+    command: python3 /usr/local/src/hidman/apps/python-examples/server.py
     devices:
       - ${HIDMAN_DEVICE}:/dev/input/hidman0
 
   hidman-client:
     <<: *hidman-base
-    command: python3 /usr/local/src/hidman/apps/python-examples/pyboard_client.py
+    command: python3 /usr/local/src/hidman/apps/python-examples/client.py
     depends_on:
       - hidman-server

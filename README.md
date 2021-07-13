@@ -17,24 +17,20 @@ Client-server architecture for sharing evdev events in a network using ZeroMQ.
 
 In order to test latency of the ZeroMQ client-server please execute:
 
-    $ docker-compose -f apps/test_latency.yml up
+    $ docker-compose -f test_latency.yml up
 
 ## Local events
 
-In order to test the visibility of events using pure evdev.read_loop() please execute:
+In order to test the correct reception of evdev raw events please type the following:
 
-    $ docker-compose -f apps/pyboard_inputs.yml up
+    $ docker-compose -f input_loop.yml up
 
-This requires either a device `/dev/input/hidman0` linked to a chosen MicroPython board,
-or a MicroPython device identifiable by name as `/dev/input/event*`
+This requires an evdev device chosen among the ones in '/dev/input/event*'. You can select your preferred device in the .env file in hidman/apps
 
 ## Client-server
 
 In order to test client and server in two docker containers please execute:
 
-    $ docker-compose -f apps/pyboard_client_server.yml up
+    $ docker-compose -f client_server.yml up
 
-This requires either a device `/dev/input/hidman0` linked to a chosen MicroPython board,
-or a MicroPython device identifiable by name as `/dev/input/event*`
-
-
+In this example the client waits for an event by calling waitEvent() remotely on the server.

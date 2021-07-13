@@ -2,10 +2,10 @@ version: '3.7'
 
 services:
 
-  pyboard-inputs:
+  evdev-inputs:
     image: iitschri/hidman:latest
 
-    command: python3 /usr/local/src/hidman/apps/python-examples/pyboard_loop.py
+    command: python3 /usr/local/src/hidman/apps/python-examples/loop.py
 
     devices:
       - ${HIDMAN_DEVICE}:/dev/input/hidman0
