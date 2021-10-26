@@ -1,0 +1,69 @@
+version: '3.7'
+
+
+services:
+
+  hidman-server:
+    image: iitschri/hidman:latest
+
+    privileged: true
+    stdin_open: true
+    tty: true
+    network_mode: host
+
+    command: python3 /usr/local/src/hidman/apps/python-examples/server.py
+    devices:
+      - ${HIDMAN_DEVICE}:/dev/input/hidman0
+
+    volumes:
+      - type: bind
+        source: ../../
+        target: /usr/local/src/hidman
+
+  lsl-sender:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        DOCKER_SRC: iitschri/lsl:v1.14.0
+        HIDMAN_VER: 0.2
+
+    privileged: true
+    stdin_open: true
+    tty: true
+    network_mode: host
+
+    volumes:
+      - type: bind
+        source: .
+        target: /usr/local/lsl
+
+    command: python3 /usr/local/lsl/lsl-client.py
+
+    depends_on:
+      - hidman-server
+
+  lsl-visualizer:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        DOCKER_SRC: iitschri/lsl:v1.14.0
+        HIDMAN_VER: 0.2
+
+    privileged: true
+    stdin_open: true
+    tty: true
+    network_mode: host
+
+    volumes:
+      - type: bind
+        source: .
+        target: /usr/local/lsl
+
+    command: python3 /usr/local/liblsl-Python-1.14.0/pylsl/examples/ReceiveAndPlot.py
+
+    environment:
+      - "DISPLAY=${DISPLAY}"
+    depends_on:
+      - lsl-sender
