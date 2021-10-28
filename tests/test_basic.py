@@ -9,4 +9,10 @@ from hidman.core import HIDServer, HIDClient
 class TestLatency:
 
     def test_run(self):
-        pass
+        serv = HIDServer()
+        t = threading.Thread(target=serv.run)
+        t.start()
+        client = HIDClient()
+        client.waitEvent()
+        serv.close()
+        t.join()

@@ -1,6 +1,5 @@
 from hidman.core import HIDClient
 
-
 dev = HIDClient(address="tcp://localhost:6666")
 
 print(dev.waitKey())

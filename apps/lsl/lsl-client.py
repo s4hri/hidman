@@ -28,6 +28,7 @@ class DevHelper:
     def worker(self):
         while self._capturing:
             sample = self._dev.waitKey()
+            print(sample)
             self.update(sample)
 
     def getSample(self):

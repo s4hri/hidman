@@ -2,25 +2,29 @@ from evdev import InputDevice, categorize, ecodes
 import evdev
 import time
 import zmq
-import statistics
-import logging
 import threading
-from select import select
 
 class HIDDevice:
 
     def __init__(self, device=None):
-        self._device = InputDevice(device)
+        if not device is None:
+            self._device = InputDevice(device)
+        else:
+            self._device = device
 
     def clear(self):
-        while not self._device.read_one() is None:
-            return
+        if not self._device is None:
+            while not self._device.read_one() is None:
+                return
 
     def read(self):
-        return self._device.read_one()
+        if not self._device is None:
+            return self._device.read_one()
+        return 0
 
     def close(self):
-        self._device.close()
+        if not self._device is None:
+            self._device.close()
 
 class HIDEvent:
 
@@ -30,6 +34,8 @@ class HIDEvent:
 
     @staticmethod
     def parse(event, event_type=None, event_code=None, event_status=None):
+        if event == 0:
+            return "VIRTUAL EVENT"
         if event_type and event.type == ecodes.EV_KEY:
             data = categorize(event)
             if event_status is None:
@@ -48,29 +54,35 @@ class HIDEvent:
 
 class HIDServer:
 
-    def __init__(self, device, address="ipc://pyboard"):
+    def __init__(self, device=None, address="ipc://pyboard"):
         self._device = HIDDevice(device)
         self._context = zmq.Context()
-        self._socket = self._context.socket(zmq.PAIR)
+        self._socket = self._context.socket(zmq.PUB)
         self._socket.bind(address)
+        self._running = False
 
     def run(self):
-        while True:
+        self._running = True
+        while self._running:
             event = self._device.read()
-            if event:
-                data = categorize(event)
+            if not event is None:
                 self._socket.send_pyobj(event)
 
-    def __del__(self):
+    def close(self):
+        self._running = False
         self._device.close()
+
+    def __del__(self):
+        self.close()
 
 class HIDClient:
 
     def __init__(self, address="ipc://pyboard"):
         self._address = address
         self._context = zmq.Context()
-        self._socket = self._context.socket(zmq.PAIR)
+        self._socket = self._context.socket(zmq.SUB)
         self._socket.connect(self._address)
+        self._socket.setsockopt(zmq.SUBSCRIBE, b'')
 
     def waitEvent(self, event_type=None, event_code=None, event_status=None, timeout_ms=None):
         t0 = time.perf_counter()
@@ -103,8 +115,6 @@ class HIDClient:
     def waitKeyRelease(self, keyList=None, evstate=HIDEvent.KEY_UP, timeout_ms=None):
         return self.waitEvent(event_type=ecodes.EV_KEY, event_code=keyList, event_status=evstate, timeout_ms=timeout_ms)
 
-    def close(self):
-        self._socket.send_pyobj(None)
-
     def __del__(self):
         self._socket.disconnect(self._address)
+        self._socket.close()

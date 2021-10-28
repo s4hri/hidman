@@ -1,0 +1,18 @@
+version: '3.7'
+
+services:
+
+  test-latency:
+    image: iitschri/hidman:latest
+
+    command: python3 /usr/local/src/hidman/apps/python-examples/latency_test.py
+
+    privileged: true
+    stdin_open: true
+    tty: true
+    network_mode: host
+
+    volumes:
+      - type: bind
+        source: ../
+        target: /usr/local/src/hidman
