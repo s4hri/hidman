@@ -13,17 +13,14 @@ class HIDDevice:
         self._device = InputDevice(device)
 
     def clear(self):
-        if self._device:
-            while not self._device.read_one() is None:
-                return
-        return
+        while not self._device.read_one() is None:
+            return
 
     def read(self):
         return self._device.read_one()
 
     def close(self):
-        if self._device:
-            self._device.close()
+        self._device.close()
 
 class HIDEvent:
 
