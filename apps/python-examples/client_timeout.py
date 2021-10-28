@@ -1,7 +1,9 @@
-from hidman.core import HIDClient, HIDKeyboard
+from hidman.core import HIDClient
 
 
 dev = HIDClient(address="tcp://localhost:6666")
 
+i = 0
 while True:
-    print(dev.waitEvent(timeout_ms=3000))
+    i=i+1
+    print(i, dev.waitKeyRelease(keyList=['KEY_4'], timeout_ms=3000))
