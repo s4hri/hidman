@@ -1,0 +1,23 @@
+version: '3.7'
+
+x-hidmanbase: &hidman-base
+
+    volumes:
+      - type: bind
+        source: ../
+        target: /usr/local/src/hidman
+
+    image: iitschri/hidman:latest
+
+    privileged: true
+    stdin_open: true
+    tty: true
+    network_mode: host
+
+services:
+
+  device_test:
+    <<: *hidman-base
+    command: python3 /usr/local/src/hidman/apps/python-examples/device_test.py
+    devices:
+      - ${HIDMAN_DEVICE}:/dev/input/hidman0

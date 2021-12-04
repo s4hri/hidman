@@ -7,7 +7,7 @@ c2 = HIDClient(address="tcp://localhost:6666")
 
 def waitKey(client):
     tid = threading.currentThread().ident
-    print("THREAD %d started", tid)
+    print("THREAD %d started" % tid)
     print(client.waitKeyPress(keyList=['KEY_1'], timeout_ms=5000), tid)
 
 

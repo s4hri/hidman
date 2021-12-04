@@ -4,7 +4,37 @@ import time
 import zmq
 import threading
 
+class HIDEvent:
+
+    KEY_UP = 0
+    KEY_DOWN = 1
+    KEY_HOLD = 2
+
+    @staticmethod
+    def parse(event, event_type=None, event_code=None, event_status=None):
+        if event is None:
+            return None
+        elif event == 0:
+            return "TEST"
+        elif event_type and event.type == ecodes.EV_KEY:
+            data = categorize(event)
+            if event_status is None:
+                if not event_code is None:
+                    if data.keycode in event_code:
+                        return (data.keystate, data.keycode, ecodes.EV_KEY)
+                else:
+                    return (data.keystate, data.keycode, ecodes.EV_KEY)
+            else:
+                if data.keystate == event_status:
+                    if event_code is None:
+                        return (data.keystate, data.keycode, ecodes.EV_KEY)
+                    elif data.keycode in event_code:
+                        return (data.keystate, data.keycode, ecodes.EV_KEY)
+        return None
+
 class HIDDevice:
+
+    POLLING_TIME_MS = 1
 
     def __init__(self, device=None):
         if not device is None:
@@ -17,39 +47,40 @@ class HIDDevice:
             while not self._device.read_one() is None:
                 return
 
-    def read(self):
-        if not self._device is None:
-            return self._device.read_one()
-        return 0
-
     def close(self):
         if not self._device is None:
             self._device.close()
 
-class HIDEvent:
+    def readLoop(self):
+        if not self._device is None:
+            return self._device.read_loop()
 
-    KEY_UP = 0
-    KEY_DOWN = 1
-    KEY_HOLD = 2
+    def readOne(self):
+        if not self._device is None:
+            return self._device.read_one()
+        return 0 #virtual event for testing purposes
 
-    @staticmethod
-    def parse(event, event_type=None, event_code=None, event_status=None):
-        if event == 0:
-            return "VIRTUAL EVENT"
-        if event_type and event.type == ecodes.EV_KEY:
-            data = categorize(event)
-            if event_status is None:
-                if not event_code is None:
-                    if data.keycode in event_code:
-                        return (data.keystate, data.keycode, ecodes.EV_KEY)
-                else:
-                    return (data.keystate, data.keycode, ecodes.EV_KEY)
-            else:
-                if data.keystate == event_status and not event_code is None:
-                    if data.keycode in event_code:
-                        return (data.keystate, data.keycode, ecodes.EV_KEY)
+    def waitEvent(self, event_type=None, event_code=None, event_status=None, timeout_ms=None):
+        t0 = time.perf_counter()
+        res = None
+        while res is None:
+            elapsed_time = (time.perf_counter() - t0)*1000.0
+            if not timeout_ms is None:
+                if timeout_ms <= elapsed_time:
+                    break
+            event = self.readOne()
+            res = HIDEvent.parse(event, event_type, event_code, event_status)
+            time.sleep(HIDDevice.POLLING_TIME_MS/1000.0)
+        return (res, elapsed_time)
 
-        return None
+    def waitKey(self, keyList=None, evstate=None, timeout_ms=None):
+        return self.waitEvent(event_type=ecodes.EV_KEY, event_code=keyList, event_status=evstate, timeout_ms=timeout_ms)
+
+    def waitKeyPress(self, keyList=None, evstate=HIDEvent.KEY_DOWN, timeout_ms=None):
+        return self.waitEvent(event_type=ecodes.EV_KEY, event_code=keyList, event_status=evstate, timeout_ms=timeout_ms)
+
+    def waitKeyRelease(self, keyList=None, evstate=HIDEvent.KEY_UP, timeout_ms=None):
+        return self.waitEvent(event_type=ecodes.EV_KEY, event_code=keyList, event_status=evstate, timeout_ms=timeout_ms)
 
 
 class HIDServer:
@@ -64,7 +95,7 @@ class HIDServer:
     def run(self):
         self._running = True
         while self._running:
-            event = self._device.read()
+            event = self._device.readOne()
             if not event is None:
                 self._socket.send_pyobj(event)
 
