@@ -18,6 +18,6 @@ services:
 
   device_test:
     <<: *hidman-base
-    command: python3 /usr/local/src/hidman/apps/python-examples/device_test.py
+    command: python3 /usr/local/src/hidman/apps/python-examples/device.py
     devices:
       - ${HIDMAN_DEVICE}:/dev/input/hidman0
