@@ -1,27 +1,19 @@
-version: '3.7'
-
-x-hidmanbase: &hidman-base
-
-    build:
-      context: .
-      dockerfile: Dockerfile
-      args:
-        DOCKER_SRC: python:3.8
-
-    volumes:
-      - type: bind
-        source: ./
-        target: /usr/local/src/hidman
-
-    image: iitschri/hidman:latest
-
-    privileged: true
-    stdin_open: true
-    tty: true
-    network_mode: host
+version: '3.8'
 
 services:
 
-  hidman-dev:
-    <<: *hidman-base
-    command: bash
+  main:
+    image: ${LOCAL_DOCKER_IMAGE}
+
+    environment:
+        - PROJECT_NAME=${PROJECT_NAME}
+
+    volumes:
+    - type: bind
+      source: ./
+      target: /home/docky/hidman
+
+    devices:
+      - "/dev/input/event18:/dev/input/hidman0"
+
+    command: terminator

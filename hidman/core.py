@@ -61,14 +61,17 @@ class HIDDevice:
         return 0 #virtual event for testing purposes
 
     def waitEvent(self, event_type=None, event_code=None, event_status=None, timeout_ms=None):
-        t0 = time.perf_counter()
+        t0 = time.time()
+        lastReadSeniority = -1
         res = None
-        while res is None:
-            elapsed_time = (time.perf_counter() - t0)*1000.0
+        while res is None or lastReadSeniority < 0:
+            elapsed_time = (time.time() - t0)*1000.0
             if not timeout_ms is None:
                 if timeout_ms <= elapsed_time:
                     break
             event = self.readOne()
+            if not event is None:
+                lastReadSeniority = event.timestamp() - t0
             res = HIDEvent.parse(event, event_type, event_code, event_status)
             time.sleep(HIDDevice.POLLING_TIME_MS/1000.0)
         return (res, elapsed_time)
@@ -116,14 +119,14 @@ class HIDClient:
         self._socket.setsockopt(zmq.SUBSCRIBE, b'')
 
     def waitEvent(self, event_type=None, event_code=None, event_status=None, timeout_ms=None):
-        t0 = time.perf_counter()
+        t0 = time.time()
         if not timeout_ms is None:
             poller = zmq.Poller()
             poller.register(self._socket, zmq.POLLIN)
         res = None
         while res is None:
             if not timeout_ms is None:
-                elapsed_time = (time.perf_counter() - t0)*1000.0
+                elapsed_time = (time.time() - t0)*1000.0
                 if timeout_ms <= elapsed_time:
                     break
                 elif poller.poll(timeout_ms-elapsed_time):
@@ -135,7 +138,7 @@ class HIDClient:
                 event = self._socket.recv_pyobj()
                 res = HIDEvent.parse(event, event_type, event_code, event_status)
 
-        return (res, time.perf_counter()-t0)
+        return (res, time.time()-t0)
 
     def waitKey(self, keyList=None, evstate=None, timeout_ms=None):
         return self.waitEvent(event_type=ecodes.EV_KEY, event_code=keyList, event_status=evstate, timeout_ms=timeout_ms)

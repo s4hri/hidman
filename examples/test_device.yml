@@ -1,0 +1,15 @@
+version: '3.7'
+
+services:
+
+  test-device:
+    image: iitschri/hidman-docker:${RELEASE_TAG}
+    command: python3 /home/docky/workdir/examples/device.py
+
+    devices:
+      - ${HIDMAN_DEVICE}:/dev/input/hidman0
+
+    volumes:
+    - type: bind
+      source: ../workdir
+      target: /home/docky/workdir

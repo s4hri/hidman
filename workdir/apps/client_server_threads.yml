@@ -1,29 +1,15 @@
 version: '3.7'
 
-x-hidmanbase: &hidman-base
-
-    volumes:
-      - type: bind
-        source: ../
-        target: /usr/local/src/hidman
-
-    image: iitschri/hidman:latest
-
-    privileged: true
-    stdin_open: true
-    tty: true
-    network_mode: host
-
 services:
 
   hidman-server:
-    <<: *hidman-base
+    image: iitschri/hidman:${RELEASE_TAG}
     command: python3 /usr/local/src/hidman/apps/python-examples/server.py
     devices:
       - ${HIDMAN_DEVICE}:/dev/input/hidman0
 
   hidman-client:
-    <<: *hidman-base
+    image: iitschri/hidman:${RELEASE_TAG}
     command: python3 /usr/local/src/hidman/apps/python-examples/client_threads.py
     depends_on:
       - hidman-server
