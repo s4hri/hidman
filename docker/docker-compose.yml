@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+
+  main:
+    image: iitschri/hidman:${RELEASE_TAG}
+
+    privileged: true
+    stdin_open: true
+    tty: true
+    network_mode: host
+
+    build:
+      context: .
+      args:
+        - DOCKER_SRC=${DOCKER_SRC}
+
+    environment:
+        - PROJECT_NAME=${PROJECT_NAME}
+        - DISPLAY=${DISPLAY}
+
+    volumes:
+      - type: volume
+        source: hidman-src
+        target: /home/icub/hidman
+
+    command: terminator
+
+volumes:
+  hidman-src:
