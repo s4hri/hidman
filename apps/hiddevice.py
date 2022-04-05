@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+
 import sys, getopt
 from hidman.core import HIDDevice
 
@@ -16,7 +18,7 @@ def main(argv):
           while True:
              print(dev.waitKey())
           dev.close()
-   print('hiddevice.py -d <device>') 
+   print('hiddevice.py -d <device>')
    sys.exit()
 
 if __name__ == "__main__":

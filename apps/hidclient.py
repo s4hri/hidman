@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+
 import sys, getopt
 from hidman.core import HIDClient
 
@@ -15,7 +17,7 @@ def main(argv):
           client = HIDClient(address="tcp://%s:6666" % server_address)
           while True:
               print(client.waitKey())
-   print('hidclient.py -s <server_address>') 
+   print('hidclient.py -s <server_address>')
    sys.exit()
 
 if __name__ == "__main__":

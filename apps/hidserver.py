@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+
 import sys, getopt
 from hidman.core import HIDServer
 
@@ -14,9 +16,8 @@ def main(argv):
           print('Device is: ', device)
           serv = HIDServer(device=device, address="tcp://*:6666")
           serv.run()
-   print('hidserver.py -d <device>') 
+   print('hidserver.py -d <device>')
    sys.exit()
 
 if __name__ == "__main__":
    main(sys.argv[1:])
-
