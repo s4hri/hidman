@@ -1,14 +1,13 @@
 version: '3.7'
 
 services:
+
   hidman-server:
     image: iitschri/hidman:${RELEASE_TAG}
-    command: python3 /usr/local/src/hidman/apps/python-examples/server.py
-    devices:
-      - ${HIDMAN_DEVICE}:/dev/input/hidman0
+    command: python3 hidserver.py -d ${HID_DEVICE}
 
   hidman-client:
     image: iitschri/hidman:${RELEASE_TAG}
-    command: python3 /usr/local/src/hidman/apps/python-examples/client.py
+    command: python3 hidclient.py -s localhost
     depends_on:
       - hidman-server

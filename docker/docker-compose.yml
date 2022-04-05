@@ -20,6 +20,10 @@ services:
         - DISPLAY=${DISPLAY}
 
     volumes:
+      - type: bind
+        source: /dev/input
+        target: /dev/input
+
       - type: volume
         source: hidman-src
         target: /home/icub/hidman

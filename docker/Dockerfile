@@ -12,3 +12,6 @@ RUN git clone https://github.com/s4hri/hidman &&\
     pip3 install .
 
 ENV PYTHONPATH $PYTHONPATH:/app/hidman
+ENV PATH $PATH:/app/hidman/apps
+
+
