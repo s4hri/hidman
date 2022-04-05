@@ -11,6 +11,8 @@ RUN git clone https://github.com/s4hri/hidman &&\
     cd hidman &&\
     pip3 install .
 
+RUN mkdir -p /root/.vscode-server /root/.vscode-server-insiders
+
 ENV PYTHONPATH $PYTHONPATH:/app/hidman
 ENV PATH $PATH:/app/hidman/apps
 
